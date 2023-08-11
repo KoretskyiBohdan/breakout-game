@@ -15,11 +15,16 @@ import {
   COLORS,
 } from './constants';
 
+const LEFT_KEY = 'ArrowLeft';
+const RIGHT_KEY = 'ArrowRight';
+const MOVE_STEP = 15;
+
 export class Game<R extends HTMLElement> {
   private screen: Screen<R>;
   private blocks: Block[] = [];
   private ball: Movable;
   private user: Movable;
+  private animationFrameId: number;
 
   constructor(root: R) {
     this.screen = new Screen(root, {
@@ -31,11 +36,20 @@ export class Game<R extends HTMLElement> {
   start() {
     this.generateBlocks();
     this.generateMovable();
-    this.startRateUpdates();
+    this.addDomEvents();
+    this.startScreenUpdates();
   }
+
   stop() {
-    console.log('game stop!');
+    window.cancelAnimationFrame(this.animationFrameId);
+    this.removeDomEvents();
   }
+
+  onKeydown = ({ key }: KeyboardEvent) => {
+    const { user } = this;
+    if (key === LEFT_KEY) user.moveX(-MOVE_STEP);
+    if (key === RIGHT_KEY) user.moveX(MOVE_STEP);
+  };
 
   private generateBlocks() {
     for (let i = 0; i < ROWS; i++) {
@@ -62,9 +76,18 @@ export class Game<R extends HTMLElement> {
     });
   }
 
-  private startRateUpdates() {
+  private addDomEvents() {
+    document.addEventListener('keydown', this.onKeydown);
+  }
+
+  private removeDomEvents() {
+    document.removeEventListener('keydown', this.onKeydown);
+  }
+
+  private startScreenUpdates() {
     const perform = () => {
       this.screen.draw([...this.blocks, this.ball, this.user]);
+      this.animationFrameId = requestAnimationFrame(perform);
     };
 
     perform();
