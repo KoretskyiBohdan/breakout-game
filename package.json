@@ -1,0 +1,22 @@
+{
+  "name": "breakout-game",
+  "version": "1.0.0",
+  "description": "",
+  "devDependencies": {
+    "parcel": "^2.9.3"
+  },
+  "scripts": {
+    "start": "parcel index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KoretskyiBohdan/breakout-game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KoretskyiBohdan/breakout-game/issues"
+  },
+  "homepage": "https://github.com/KoretskyiBohdan/breakout-game#readme"
+}
