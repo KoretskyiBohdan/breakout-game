@@ -29,13 +29,13 @@ export class Game<R extends HTMLElement> {
     });
   }
 
-  start() {
+  startGame() {
     this.createObjects();
-    this.startBall();
     this.startScreenUpdates();
+    this.ball.start();
   }
 
-  stop() {
+  stopGame() {
     window.cancelAnimationFrame(this.animationFrameId);
     this.ball.stop();
   }
@@ -49,39 +49,37 @@ export class Game<R extends HTMLElement> {
       return new Block(x, y);
     });
 
-    this.ball = new Ball(BALL_INITIAL_POSITION);
+    this.ball = new Ball(BALL_INITIAL_POSITION, this.onBallPositionUpdate);
     this.user = new User(USER_INITIAL_POSITION);
   }
 
-  private startBall() {
+  onBallPositionUpdate = () => {
     const { ball, user } = this;
-    ball.start();
+    const radius = ball.height / 2;
 
-    ball.onUpdate = () => {
-      const radius = ball.height / 2;
+    // Board collisions
+    if (ball.position.y - radius <= 0) {
+      ball.changeDirection('y');
+    } else if (
+      ball.position.x - radius <= 0 ||
+      ball.position.x + radius >= SCREEN_WIDTH
+    ) {
+      ball.changeDirection('x');
+    } else if (ball.position.y + radius >= SCREEN_HEIGHT) {
+      this.stopGame();
+    }
 
-      if (ball.position.y - radius <= 0) {
-        ball.changeDirection('y');
-      } else if (
-        ball.position.x - radius <= 0 ||
-        ball.position.x + radius >= SCREEN_WIDTH
-      ) {
-        ball.changeDirection('x');
-      } else if (ball.position.y + radius >= SCREEN_HEIGHT) {
-        this.stop();
-      }
-
-      if (
-        ball.position.x - radius >= user.position.x &&
-        ball.position.x - radius <= user.position.x + user.width &&
-        ball.position.y + radius >= user.position.y &&
-        ball.position.y - radius <= user.position.y
-      ) {
-        // always change to top by Y
-        ball.changeDirection('y', -1);
-      }
-    };
-  }
+    // User collission
+    if (
+      ball.position.x - radius >= user.position.x &&
+      ball.position.x - radius <= user.position.x + user.width &&
+      ball.position.y + radius >= user.position.y &&
+      ball.position.y - radius <= user.position.y
+    ) {
+      // always change to top by Y
+      ball.changeDirection('y', -1);
+    }
+  };
 
   private startScreenUpdates() {
     const perform = () => {

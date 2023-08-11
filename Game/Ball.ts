@@ -1,25 +1,34 @@
 import { BaseShape } from './BaseShape';
-import { BALL_SIZE, COLORS, SCREEN_WIDTH, SCREEN_HEIGHT } from './constants';
+import {
+  BALL_SIZE,
+  BALL_SPEED,
+  COLORS,
+  SCREEN_WIDTH,
+  SCREEN_HEIGHT,
+} from './constants';
 
-const BALL_SPEED = 100;
+type UpdateFnType = () => unknown;
 
 export class Ball extends BaseShape {
   private animationFrameId: number;
+  private onUpdate: UpdateFnType;
 
   directionX = 1;
   directionY = 1;
 
-  constructor(position: { x: number; y: number }) {
+  constructor(position: { x: number; y: number }, onUpdate: UpdateFnType) {
     super(position, {
       width: BALL_SIZE,
       height: BALL_SIZE,
       color: COLORS.BALL,
       type: 'ball',
     });
+
+    this.onUpdate = onUpdate;
   }
 
   start = () => {
-    window.cancelAnimationFrame(this.animationFrameId);
+    this.stop();
 
     let lastCall = Date.now();
 
@@ -47,14 +56,9 @@ export class Ball extends BaseShape {
   stop = () => {
     window.cancelAnimationFrame(this.animationFrameId);
   };
-  // placeholder
-  onUpdate: () => unknown;
 
   changeDirection(axis: 'x' | 'y', direction?: -1 | 1) {
-    if (axis === 'x') this.directionX = direction || -this.directionX;
-    if (axis === 'y') this.directionY = direction || -this.directionY;
+    const key = `direction${axis.toUpperCase()}`;
+    this[key] = direction || -this[key];
   }
-
-  changeDirectionX = (v?: number) => (this.directionX = v || -this.directionX);
-  changeDirectionY = (v?: number) => (this.directionY = v || -this.directionY);
 }
