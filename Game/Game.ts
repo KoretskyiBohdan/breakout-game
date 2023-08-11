@@ -1,6 +1,7 @@
 import { Screen } from './Screen';
 import { Block } from './Block';
-import { Movable } from './Movable';
+import { Ball } from './Ball';
+import { User } from './User';
 import {
   SCREEN_WIDTH,
   SCREEN_HEIGHT,
@@ -9,34 +10,23 @@ import {
   BLOCK_PADDING,
   ROWS,
   BLOCK_PER_ROW,
-  BALL_DIAMETER,
   BALL_INITIAL_POSITION,
   USER_INITIAL_POSITION,
-  COLORS,
 } from './constants';
 import { createArray } from './utils';
-
-const LEFT_KEY = 'ArrowLeft';
-const RIGHT_KEY = 'ArrowRight';
-// TODO: update as real speed per second
-const MOVE_STEP = 15;
-const BALL_SPEED = 2;
 
 export class Game<R extends HTMLElement> {
   private screen: Screen<R>;
   private blocks: Block[] = [];
-  private ball: Movable;
-  private user: Movable;
+  private ball: Ball;
+  private user: User;
   private animationFrameId: number;
-  private ballIntervalId: number;
 
   constructor(root: R) {
     this.screen = new Screen(root, {
       width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT,
     });
-
-    window.document.addEventListener('keydown', this.onKeydown);
   }
 
   start() {
@@ -47,23 +37,8 @@ export class Game<R extends HTMLElement> {
 
   stop() {
     window.cancelAnimationFrame(this.animationFrameId);
-    window.clearInterval(this.ballIntervalId);
+    this.ball.stop();
   }
-
-  onKeydown = ({ key }: KeyboardEvent) => {
-    const { user } = this;
-    if (key === LEFT_KEY) {
-      const v = Math.max(user.position.x - MOVE_STEP, 0);
-      user.moveX(v);
-    }
-    if (key === RIGHT_KEY) {
-      const v = Math.min(
-        user.position.x + MOVE_STEP,
-        SCREEN_WIDTH - user.width
-      );
-      user.moveX(v);
-    }
-  };
 
   private createObjects() {
     this.blocks = createArray(ROWS * BLOCK_PER_ROW).map((_, i) => {
@@ -74,56 +49,38 @@ export class Game<R extends HTMLElement> {
       return new Block(x, y);
     });
 
-    this.ball = new Movable(BALL_INITIAL_POSITION, {
-      width: BALL_DIAMETER / 2,
-      height: BALL_DIAMETER / 2,
-      color: COLORS.BALL,
-      type: 'ball',
-    });
-
-    this.user = new Movable(USER_INITIAL_POSITION, {
-      width: BLOCK_WIDTH,
-      height: BLOCK_HEIGHT / 2,
-      color: COLORS.USER,
-      type: 'rect',
-    });
+    this.ball = new Ball(BALL_INITIAL_POSITION);
+    this.user = new User(USER_INITIAL_POSITION);
   }
 
   private startBall() {
-    let directionX = -BALL_SPEED;
-    let directionY = -BALL_SPEED;
+    const { ball, user } = this;
+    ball.start();
 
-    this.ballIntervalId = setInterval(() => {
-      const { ball, user } = this;
+    ball.onUpdate = () => {
+      const radius = ball.height / 2;
 
-      for (let i = 0; i < this.blocks.length; i++) {
-        // remove on collisions
-      }
-
-      if (ball.position.y - ball.height <= 0) {
-        directionY = BALL_SPEED;
-      } else if (ball.position.x - ball.width <= 0) {
-        directionX = BALL_SPEED;
-      } else if (ball.position.x + ball.width >= SCREEN_WIDTH) {
-        directionX = -BALL_SPEED;
-      } else if (ball.position.y + ball.height >= SCREEN_HEIGHT) {
-        // todo: game over
-        directionY = -BALL_SPEED;
+      if (ball.position.y - radius <= 0) {
+        ball.changeDirection('y');
+      } else if (
+        ball.position.x - radius <= 0 ||
+        ball.position.x + radius >= SCREEN_WIDTH
+      ) {
+        ball.changeDirection('x');
+      } else if (ball.position.y + radius >= SCREEN_HEIGHT) {
+        this.stop();
       }
 
       if (
-        user.position.x <= ball.position.x &&
-        user.position.x + user.width >= ball.position.x + ball.width &&
-        user.position.y <= ball.position.y + ball.height
+        ball.position.x - radius >= user.position.x &&
+        ball.position.x - radius <= user.position.x + user.width &&
+        ball.position.y + radius >= user.position.y &&
+        ball.position.y - radius <= user.position.y
       ) {
-        directionY = -BALL_SPEED;
+        // always change to top by Y
+        ball.changeDirection('y', -1);
       }
-      const x = Math.max(ball.position.x + directionX, ball.width);
-      const y = Math.max(ball.position.y + directionY, ball.height);
-
-      ball.moveX(Math.min(x, SCREEN_WIDTH - ball.width));
-      ball.moveY(Math.min(y, SCREEN_HEIGHT - ball.height));
-    });
+    };
   }
 
   private startScreenUpdates() {

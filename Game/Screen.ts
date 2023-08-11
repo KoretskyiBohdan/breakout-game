@@ -1,4 +1,4 @@
-import { Shape } from './Shape';
+import { BaseShape } from './BaseShape';
 
 export type ScreenOptions = {
   width: number;
@@ -35,7 +35,7 @@ export class Screen<R extends HTMLElement> {
     this.root.appendChild(this.canvas);
   }
 
-  draw(nodes: Shape[]) {
+  draw(nodes: BaseShape[]) {
     const { width, height } = this.options;
     const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
 
@@ -52,7 +52,7 @@ export class Screen<R extends HTMLElement> {
         ctx.fillRect(position.x, position.y, node.width, node.height);
       }
       if (node.type === 'ball') {
-        ctx.arc(position.x, position.y, node.height, 0, 2 * Math.PI);
+        ctx.arc(position.x, position.y, node.height / 2, 0, 2 * Math.PI);
         ctx.fill();
       }
       ctx.closePath();

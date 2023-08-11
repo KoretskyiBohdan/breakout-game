@@ -10,7 +10,7 @@ export type ShapeOptions = {
   color: string;
 };
 
-export class Shape {
+export class BaseShape {
   position: ShapePosition;
   width: ShapeOptions['width'];
   height: ShapeOptions['height'];

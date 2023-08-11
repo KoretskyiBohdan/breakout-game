@@ -1,7 +1,7 @@
-import { Shape } from './Shape';
+import { BaseShape } from './BaseShape';
 import { BLOCK_WIDTH, BLOCK_HEIGHT, COLORS } from './constants';
 
-export class Block extends Shape {
+export class Block extends BaseShape {
   constructor(x: number, y: number) {
     super(
       { x, y },
