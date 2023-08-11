@@ -17,7 +17,9 @@ import {
 
 const LEFT_KEY = 'ArrowLeft';
 const RIGHT_KEY = 'ArrowRight';
+// TODO: update as real speed per second
 const MOVE_STEP = 15;
+const BALL_SPEED = 2;
 
 export class Game<R extends HTMLElement> {
   private screen: Screen<R>;
@@ -89,36 +91,40 @@ export class Game<R extends HTMLElement> {
   }
 
   private startBall() {
-    const { ball } = this;
-    const { user } = this;
-
-    let directionX = 2;
-    let directionY = 2;
+    let directionX = -BALL_SPEED;
+    let directionY = -BALL_SPEED;
 
     this.ballIntervalId = setInterval(() => {
-      const { position } = ball;
+      const { ball, user } = this;
 
-      if (position.y - ball.height <= 0) {
-        directionY = 2;
-      }
-      if (position.x - ball.width <= 0) {
-        directionX = 2;
-      }
-      if (position.x + ball.width >= SCREEN_WIDTH) {
-        directionX = -2;
+      for (let i = 0; i < this.blocks.length; i++) {
+        // remove on collisions
       }
 
-      if (position.y + ball.height >= SCREEN_HEIGHT) {
-        // GAME OVER!
-        this.stop();
+      if (ball.position.y - ball.height <= 0) {
+        directionY = BALL_SPEED;
+      } else if (ball.position.x - ball.width <= 0) {
+        directionX = BALL_SPEED;
+      } else if (ball.position.x + ball.width >= SCREEN_WIDTH) {
+        directionX = -BALL_SPEED;
+      } else if (ball.position.y + ball.height >= SCREEN_HEIGHT) {
+        // todo: game over
+        directionY = -BALL_SPEED;
       }
 
-      if (ball.isCollision(user)) {
-        directionY = -2;
+      if (
+        user.position.x <= ball.position.x &&
+        user.position.x + user.width >= ball.position.x + ball.width &&
+        user.position.y <= ball.position.y + ball.height
+      ) {
+        directionY = -BALL_SPEED;
       }
-      ball.moveX(position.x + directionX);
-      ball.moveY(position.y + directionY);
-    }, 50);
+      const x = Math.max(ball.position.x + directionX, ball.width);
+      const y = Math.max(ball.position.y + directionY, ball.height);
+
+      ball.moveX(Math.min(x, SCREEN_WIDTH - ball.width));
+      ball.moveY(Math.min(y, SCREEN_HEIGHT - ball.height));
+    });
   }
 
   private addDomEvents() {

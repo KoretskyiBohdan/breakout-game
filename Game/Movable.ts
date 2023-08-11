@@ -14,16 +14,4 @@ export class Movable extends Shape {
     const { position } = this;
     position.y = val;
   }
-
-  isCollision(shape: Shape) {
-    const { position, height, width } = this;
-
-    const isCollision =
-      position.y + height >= shape.position.y &&
-      position.y <= shape.position.y + shape.height &&
-      position.x >= shape.position.x &&
-      position.x - width <= shape.position.x + shape.width;
-
-    return isCollision;
-  }
 }
