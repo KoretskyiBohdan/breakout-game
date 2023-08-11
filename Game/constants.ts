@@ -3,16 +3,16 @@ export const BLOCK_HEIGHT = 30;
 export const BLOCK_PADDING = 10;
 
 export const SCREEN_WIDTH = 710;
-export const SCREEN_HEIGHT = 400;
+export const SCREEN_HEIGHT = 440;
 
 export const ROWS = 4;
 export const BLOCK_PER_ROW = 5;
 
 export const BALL_SIZE = 20;
+// px per second
 export const BALL_SPEED = 160;
-
-// per keydown event
-export const USER_MOVE_STEP = 20;
+// px per second
+export const USER_SPEED = 600;
 
 export const BALL_INITIAL_POSITION = {
   x: SCREEN_WIDTH / 2,

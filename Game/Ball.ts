@@ -13,8 +13,8 @@ export class Ball extends BaseShape {
   private animationFrameId: number;
   private onUpdate: UpdateFnType;
 
-  directionX = 1;
-  directionY = 1;
+  directionX = -1;
+  directionY = -1;
 
   constructor(position: { x: number; y: number }, onUpdate: UpdateFnType) {
     super(position, {
