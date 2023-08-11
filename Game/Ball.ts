@@ -27,6 +27,10 @@ export class Ball extends BaseShape {
     this.onUpdate = onUpdate;
   }
 
+  get radius() {
+    return this.height / 2;
+  }
+
   start = () => {
     this.stop();
 
@@ -36,8 +40,7 @@ export class Ball extends BaseShape {
       const now = Date.now();
       const secondsPassed = (now - lastCall) / 1000;
       const diff = BALL_SPEED * secondsPassed;
-      const { position, height, directionX, directionY } = this;
-      const radius = height / 2;
+      const { position, radius, directionX, directionY } = this;
 
       const x = Math.max(position.x + diff * directionX, radius);
       const y = Math.max(position.y + diff * directionY, radius);
@@ -56,6 +59,26 @@ export class Ball extends BaseShape {
   stop = () => {
     window.cancelAnimationFrame(this.animationFrameId);
   };
+
+  hasCollisionsWith(obj: BaseShape) {
+    return (
+      this.position.x + this.radius >= obj.position.x &&
+      this.position.x - this.radius <= obj.position.x + obj.width &&
+      this.position.y + this.radius >= obj.position.y &&
+      this.position.y - this.radius <= obj.position.y + obj.height
+    );
+  }
+
+  hasSideCollisionWith(obj: BaseShape) {
+    const offset = 2;
+    const byLeft =
+      this.position.x + this.radius >= obj.position.x &&
+      this.position.x + this.radius <= obj.position.x + offset;
+    const byRight =
+      this.position.x - this.radius >= obj.position.x + obj.width - offset &&
+      this.position.x - this.radius <= obj.position.x + obj.width;
+    return byLeft || byRight;
+  }
 
   changeDirection(axis: 'x' | 'y', direction?: -1 | 1) {
     const key = `direction${axis.toUpperCase()}`;

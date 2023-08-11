@@ -9,7 +9,10 @@ export const ROWS = 4;
 export const BLOCK_PER_ROW = 5;
 
 export const BALL_SIZE = 20;
-export const BALL_SPEED = 110;
+export const BALL_SPEED = 160;
+
+// per keydown event
+export const USER_MOVE_STEP = 20;
 
 export const BALL_INITIAL_POSITION = {
   x: SCREEN_WIDTH / 2,

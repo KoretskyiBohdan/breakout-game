@@ -13,7 +13,13 @@ import {
   BALL_INITIAL_POSITION,
   USER_INITIAL_POSITION,
 } from './constants';
-import { createArray } from './utils';
+
+export const createArray = (size = 0) => {
+  const arr: null[] = [];
+
+  for (let i = 0; i < size; i++) arr[i] = null;
+  return arr;
+};
 
 export class Game<R extends HTMLElement> {
   private screen: Screen<R>;
@@ -55,27 +61,35 @@ export class Game<R extends HTMLElement> {
 
   onBallPositionUpdate = () => {
     const { ball, user } = this;
-    const radius = ball.height / 2;
+
+    // Blocks collisions
+    for (let i = 0; i < this.blocks.length; i++) {
+      const block = this.blocks[i];
+
+      if (ball.hasCollisionsWith(block)) {
+        if (ball.hasSideCollisionWith(block)) {
+          ball.changeDirection('x');
+        } else {
+          ball.changeDirection('y');
+        }
+        this.blocks.splice(i, 1);
+      }
+    }
 
     // Board collisions
-    if (ball.position.y - radius <= 0) {
+    if (ball.position.y - ball.radius <= 0) {
       ball.changeDirection('y');
     } else if (
-      ball.position.x - radius <= 0 ||
-      ball.position.x + radius >= SCREEN_WIDTH
+      ball.position.x - ball.radius <= 0 ||
+      ball.position.x + ball.radius >= SCREEN_WIDTH
     ) {
       ball.changeDirection('x');
-    } else if (ball.position.y + radius >= SCREEN_HEIGHT) {
+    } else if (ball.position.y + ball.radius >= SCREEN_HEIGHT) {
       this.stopGame();
     }
 
     // User collission
-    if (
-      ball.position.x - radius >= user.position.x &&
-      ball.position.x - radius <= user.position.x + user.width &&
-      ball.position.y + radius >= user.position.y &&
-      ball.position.y - radius <= user.position.y
-    ) {
+    if (ball.hasCollisionsWith(user)) {
       // always change to top by Y
       ball.changeDirection('y', -1);
     }
