@@ -25,6 +25,7 @@ export class Game<R extends HTMLElement> {
   private ball: Movable;
   private user: Movable;
   private animationFrameId: number;
+  private ballIntervalId: number;
 
   constructor(root: R) {
     this.screen = new Screen(root, {
@@ -37,18 +38,29 @@ export class Game<R extends HTMLElement> {
     this.generateBlocks();
     this.generateMovable();
     this.addDomEvents();
+    this.startBall();
     this.startScreenUpdates();
   }
 
   stop() {
     window.cancelAnimationFrame(this.animationFrameId);
+    window.clearInterval(this.ballIntervalId);
     this.removeDomEvents();
   }
 
   onKeydown = ({ key }: KeyboardEvent) => {
     const { user } = this;
-    if (key === LEFT_KEY) user.moveX(-MOVE_STEP);
-    if (key === RIGHT_KEY) user.moveX(MOVE_STEP);
+    if (key === LEFT_KEY) {
+      const v = Math.max(user.position.x - MOVE_STEP, 0);
+      user.moveX(v);
+    }
+    if (key === RIGHT_KEY) {
+      const v = Math.min(
+        user.position.x + MOVE_STEP,
+        SCREEN_WIDTH - user.width
+      );
+      user.moveX(v);
+    }
   };
 
   private generateBlocks() {
@@ -62,8 +74,8 @@ export class Game<R extends HTMLElement> {
   }
   private generateMovable() {
     this.ball = new Movable(BALL_INITIAL_POSITION, {
-      width: BALL_DIAMETER,
-      height: BALL_DIAMETER,
+      width: BALL_DIAMETER / 2,
+      height: BALL_DIAMETER / 2,
       color: COLORS.BALL,
       type: 'ball',
     });
@@ -74,6 +86,39 @@ export class Game<R extends HTMLElement> {
       color: COLORS.USER,
       type: 'rect',
     });
+  }
+
+  private startBall() {
+    const { ball } = this;
+    const { user } = this;
+
+    let directionX = 2;
+    let directionY = 2;
+
+    this.ballIntervalId = setInterval(() => {
+      const { position } = ball;
+
+      if (position.y - ball.height <= 0) {
+        directionY = 2;
+      }
+      if (position.x - ball.width <= 0) {
+        directionX = 2;
+      }
+      if (position.x + ball.width >= SCREEN_WIDTH) {
+        directionX = -2;
+      }
+
+      if (position.y + ball.height >= SCREEN_HEIGHT) {
+        // GAME OVER!
+        this.stop();
+      }
+
+      if (ball.isCollision(user)) {
+        directionY = -2;
+      }
+      ball.moveX(position.x + directionX);
+      ball.moveY(position.y + directionY);
+    }, 50);
   }
 
   private addDomEvents() {

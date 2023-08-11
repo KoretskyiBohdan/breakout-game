@@ -1,5 +1,4 @@
 import { Shape, ShapePosition, ShapeOptions } from './Shape';
-import { SCREEN_WIDTH } from './constants';
 
 export class Movable extends Shape {
   constructor(position: ShapePosition, options: ShapeOptions) {
@@ -7,11 +6,24 @@ export class Movable extends Shape {
   }
 
   moveX(val: number) {
-    const { position, width } = this;
-    position.x = Math.max(Math.min(position.x + val, SCREEN_WIDTH - width), 0);
+    const { position } = this;
+    position.x = val;
   }
 
   moveY(val: number) {
-    console.log('move Y');
+    const { position } = this;
+    position.y = val;
+  }
+
+  isCollision(shape: Shape) {
+    const { position, height, width } = this;
+
+    const isCollision =
+      position.y + height >= shape.position.y &&
+      position.y <= shape.position.y + shape.height &&
+      position.x >= shape.position.x &&
+      position.x - width <= shape.position.x + shape.width;
+
+    return isCollision;
   }
 }
