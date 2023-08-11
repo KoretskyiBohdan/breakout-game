@@ -14,6 +14,7 @@ import {
   USER_INITIAL_POSITION,
   COLORS,
 } from './constants';
+import { createArray } from './utils';
 
 const LEFT_KEY = 'ArrowLeft';
 const RIGHT_KEY = 'ArrowRight';
@@ -34,12 +35,12 @@ export class Game<R extends HTMLElement> {
       width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT,
     });
+
+    window.document.addEventListener('keydown', this.onKeydown);
   }
 
   start() {
-    this.generateBlocks();
-    this.generateMovable();
-    this.addDomEvents();
+    this.createObjects();
     this.startBall();
     this.startScreenUpdates();
   }
@@ -47,7 +48,6 @@ export class Game<R extends HTMLElement> {
   stop() {
     window.cancelAnimationFrame(this.animationFrameId);
     window.clearInterval(this.ballIntervalId);
-    this.removeDomEvents();
   }
 
   onKeydown = ({ key }: KeyboardEvent) => {
@@ -65,16 +65,15 @@ export class Game<R extends HTMLElement> {
     }
   };
 
-  private generateBlocks() {
-    for (let i = 0; i < ROWS; i++) {
-      for (let j = 0; j < BLOCK_PER_ROW; j++) {
-        const x = BLOCK_PADDING + j * (BLOCK_WIDTH + BLOCK_PADDING);
-        const y = BLOCK_PADDING + (BLOCK_HEIGHT + BLOCK_PADDING) * i;
-        this.blocks.push(new Block(x, y));
-      }
-    }
-  }
-  private generateMovable() {
+  private createObjects() {
+    this.blocks = createArray(ROWS * BLOCK_PER_ROW).map((_, i) => {
+      const index = i % BLOCK_PER_ROW;
+      const row = Math.floor(i / BLOCK_PER_ROW);
+      const x = BLOCK_PADDING + index * (BLOCK_WIDTH + BLOCK_PADDING);
+      const y = BLOCK_PADDING + (BLOCK_HEIGHT + BLOCK_PADDING) * row;
+      return new Block(x, y);
+    });
+
     this.ball = new Movable(BALL_INITIAL_POSITION, {
       width: BALL_DIAMETER / 2,
       height: BALL_DIAMETER / 2,
@@ -125,14 +124,6 @@ export class Game<R extends HTMLElement> {
       ball.moveX(Math.min(x, SCREEN_WIDTH - ball.width));
       ball.moveY(Math.min(y, SCREEN_HEIGHT - ball.height));
     });
-  }
-
-  private addDomEvents() {
-    document.addEventListener('keydown', this.onKeydown);
-  }
-
-  private removeDomEvents() {
-    document.removeEventListener('keydown', this.onKeydown);
   }
 
   private startScreenUpdates() {
