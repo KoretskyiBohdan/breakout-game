@@ -1,4 +1,5 @@
 import { Screen } from './Screen';
+import { Controls } from './Controls';
 import { Block } from './Block';
 import { Ball } from './Ball';
 import { User } from './User';
@@ -22,28 +23,54 @@ export const createArray = (size = 0) => {
 };
 
 export class Game<R extends HTMLElement> {
+  private root: R;
   private screen: Screen<R>;
+  private controls: Controls;
   private blocks: Block[] = [];
   private ball: Ball;
   private user: User;
+  private score: number = 0;
   private animationFrameId: number;
 
   constructor(root: R) {
+    this.root = root;
     this.screen = new Screen(root, {
       width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT,
     });
+
+    this.controls = new Controls(root, {
+      START: () => this.startGame(),
+      NEW: () => this.startGame(),
+    });
+
+    this.init();
+  }
+
+  init() {
+    this.createObjects();
+    this.screen.draw([...this.blocks, this.ball, this.user]);
   }
 
   startGame() {
+    this.stopGame();
+    this.score = 0;
+    this.updateScore();
     this.createObjects();
     this.startScreenUpdates();
     this.ball.start();
+    this.controls.setIsRuning(true);
   }
 
   stopGame() {
     window.cancelAnimationFrame(this.animationFrameId);
     this.ball.stop();
+    this.controls.setIsRuning(false);
+  }
+
+  updateScore() {
+    const score = this.root.getElementsByClassName('score')[0];
+    if (score) score.innerHTML = `Score: ${this.score}`;
   }
 
   private createObjects() {
@@ -55,8 +82,11 @@ export class Game<R extends HTMLElement> {
       return new Block(x, y);
     });
 
-    this.ball = new Ball(BALL_INITIAL_POSITION, this.onBallPositionUpdate);
-    this.user = new User(USER_INITIAL_POSITION);
+    this.ball = new Ball(
+      { ...BALL_INITIAL_POSITION },
+      this.onBallPositionUpdate
+    );
+    this.user = new User({ ...USER_INITIAL_POSITION });
   }
 
   onBallPositionUpdate = () => {
@@ -73,6 +103,8 @@ export class Game<R extends HTMLElement> {
           ball.changeDirection('y');
         }
         this.blocks.splice(i, 1);
+        this.score += 10;
+        this.updateScore();
       }
     }
 

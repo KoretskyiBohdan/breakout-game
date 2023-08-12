@@ -1,0 +1,38 @@
+.game {
+  font-family: sans-serif;
+  display: flex;
+  height: 800px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.game .info {
+  color: #001f3f;
+  margin-bottom: 20px;
+}
+
+.game .info .score {
+  line-height: 30px;
+  text-align: left;
+  font-size: 18px;
+  background: #e9e9ed;
+  border-radius: 6px;
+  padding: 0 8px;
+}
+
+.game canvas {
+  border: 1px solid #104d89;
+}
+
+.game .controls {
+  margin-top: 20px;
+}
+
+.game .controls button {
+  cursor: pointer;
+  color: #001f3f;
+  height: 40px;
+  padding: 0 20px;
+  /* border: none; */
+}

@@ -19,20 +19,13 @@ export class Screen<R extends HTMLElement> {
 
   private init() {
     const { width, height } = this.options;
-    const canvas = document.createElement('canvas');
+    const canvas = this.root.getElementsByTagName('canvas')[0];
+
+    if (!canvas) throw new Error('Cannot find canvas element!');
 
     canvas.width = width;
     canvas.height = height;
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.bottom = '0';
-    canvas.style.left = '0';
-    canvas.style.right = '0';
-    canvas.style.margin = 'auto';
-    canvas.style.border = '1px solid #000';
-
     this.canvas = canvas;
-    this.root.appendChild(this.canvas);
   }
 
   draw(nodes: BaseShape[]) {

@@ -3,9 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <title>Breakout Game</title>
+    <link rel="stylesheet" href="game.css" />
   </head>
   <body>
-    <div id="game"></div>
+    <div id="game" class="game">
+      <div class="info">
+        <div class="score">Score: 0</div>
+      </div>
+      <canvas></canvas>
+      <div class="controls">
+        <button type="button">Start</button>
+      </div>
+    </div>
     <script type="module" src="index.ts"></script>
   </body>
 </html>
