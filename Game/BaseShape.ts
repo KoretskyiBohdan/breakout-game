@@ -16,6 +16,7 @@ export class BaseShape {
   height: ShapeOptions['height'];
   type: ShapeOptions['type'];
   color: ShapeOptions['color'];
+  opticity = 1;
 
   constructor(position: ShapePosition, options: ShapeOptions) {
     this.position = position;

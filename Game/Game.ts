@@ -1,5 +1,6 @@
 import { Screen } from './Screen';
 import { Controls } from './Controls';
+import { Sound } from './Sound';
 import { Block } from './Block';
 import { Ball } from './Ball';
 import { User } from './User';
@@ -26,17 +27,20 @@ export class Game<R extends HTMLElement> {
   private root: R;
   private screen: Screen<R>;
   private controls: Controls;
+  private sound: Sound;
   private blocks: Block[] = [];
   private ball: Ball;
   private user: User;
   private score: number = 0;
-  private animationFrameId: number;
 
   constructor(root: R) {
     this.root = root;
     this.screen = new Screen(root, {
       width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT,
+      onUpdate: () => {
+        this.screen.draw([...this.blocks, this.ball, this.user]);
+      },
     });
 
     this.controls = new Controls(root, {
@@ -44,31 +48,29 @@ export class Game<R extends HTMLElement> {
       NEW: () => this.startGame(),
     });
 
-    this.init();
-  }
-
-  init() {
+    this.sound = new Sound(root);
+    // first paint
     this.createObjects();
-    this.screen.draw([...this.blocks, this.ball, this.user]);
+    this.screen.enableRefresh();
   }
 
   startGame() {
     this.stopGame();
-    this.score = 0;
-    this.updateScore();
+
+    this.updateScore(0);
     this.createObjects();
-    this.startScreenUpdates();
     this.ball.start();
+    this.user.start();
     this.controls.setIsRuning(true);
   }
 
   stopGame() {
-    window.cancelAnimationFrame(this.animationFrameId);
     this.ball.stop();
     this.controls.setIsRuning(false);
   }
 
-  updateScore() {
+  updateScore(val: number) {
+    this.score = val;
     const score = this.root.getElementsByClassName('score')[0];
     if (score) score.innerHTML = `Score: ${this.score}`;
   }
@@ -90,8 +92,9 @@ export class Game<R extends HTMLElement> {
   }
 
   onBallPositionUpdate = () => {
-    if (this.blocks.length === 0) {
+    if (this.blocks.every((b) => b.isDistroyed)) {
       this.stopGame();
+      this.sound.play('won');
       return;
     }
 
@@ -101,15 +104,17 @@ export class Game<R extends HTMLElement> {
     for (let i = 0; i < this.blocks.length; i++) {
       const block = this.blocks[i];
 
+      if (block.isDistroyed) continue;
+
       if (ball.hasCollisionsWith(block)) {
         if (ball.hasSideCollisionWith(block)) {
           ball.changeDirection('x');
         } else {
           ball.changeDirection('y');
         }
-        this.blocks.splice(i, 1);
-        this.score += 10;
-        this.updateScore();
+        block.destroy();
+        this.updateScore(this.score + 10);
+        this.sound.play('hit');
       }
     }
 
@@ -122,6 +127,7 @@ export class Game<R extends HTMLElement> {
     ) {
       ball.changeDirection('x');
     } else if (ball.position.y + ball.radius >= SCREEN_HEIGHT) {
+      this.sound.play('lose');
       this.stopGame();
     }
 
@@ -131,13 +137,4 @@ export class Game<R extends HTMLElement> {
       ball.changeDirection('y', -1);
     }
   };
-
-  private startScreenUpdates() {
-    const perform = () => {
-      this.screen.draw([...this.blocks, this.ball, this.user]);
-      this.animationFrameId = requestAnimationFrame(perform);
-    };
-
-    perform();
-  }
 }

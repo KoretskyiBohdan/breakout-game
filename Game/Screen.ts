@@ -3,12 +3,14 @@ import { BaseShape } from './BaseShape';
 export type ScreenOptions = {
   width: number;
   height: number;
+  onUpdate: () => unknown;
 };
 
 export class Screen<R extends HTMLElement> {
   private root: R;
   private canvas: HTMLCanvasElement;
   private options: ScreenOptions;
+  private animationFrameId: number;
 
   constructor(root: R, options: ScreenOptions) {
     this.root = root;
@@ -28,6 +30,21 @@ export class Screen<R extends HTMLElement> {
     this.canvas = canvas;
   }
 
+  enableRefresh() {
+    const perform = () => {
+      if (typeof this.options.onUpdate === 'function') {
+        this.options.onUpdate();
+      }
+      this.animationFrameId = requestAnimationFrame(perform);
+    };
+
+    perform();
+  }
+
+  disableRefresh() {
+    window.cancelAnimationFrame(this.animationFrameId);
+  }
+
   draw(nodes: BaseShape[]) {
     const { width, height } = this.options;
     const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -40,6 +57,8 @@ export class Screen<R extends HTMLElement> {
 
       ctx.beginPath();
       ctx.fillStyle = node.color;
+
+      ctx.globalAlpha = node.opticity;
 
       if (node.type === 'rect') {
         ctx.fillRect(position.x, position.y, node.width, node.height);
