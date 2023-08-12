@@ -90,6 +90,11 @@ export class Game<R extends HTMLElement> {
   }
 
   onBallPositionUpdate = () => {
+    if (this.blocks.length === 0) {
+      this.stopGame();
+      return;
+    }
+
     const { ball, user } = this;
 
     // Blocks collisions

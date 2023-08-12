@@ -9,7 +9,7 @@ import {
 
 const LEFT_KEY = 'ArrowLeft';
 const RIGHT_KEY = 'ArrowRight';
-const ANIMATION_DURATION = 0.1;
+const ANIMATION_DURATION = 0.13;
 
 export class User extends BaseShape {
   private animationFrameId: number;
