@@ -54,7 +54,7 @@ export class Game<R extends HTMLElement> {
     this.screen.enableRefresh();
   }
 
-  startGame() {
+  startGame = () => {
     this.stopGame();
 
     this.updateScore(0);
@@ -62,18 +62,18 @@ export class Game<R extends HTMLElement> {
     this.ball.start();
     this.user.start();
     this.controls.setIsRuning(true);
-  }
+  };
 
-  stopGame() {
+  stopGame = () => {
     this.ball.stop();
     this.controls.setIsRuning(false);
-  }
+  };
 
-  updateScore(val: number) {
+  private updateScore = (val: number) => {
     this.score = val;
     const score = this.root.getElementsByClassName('score')[0];
     if (score) score.innerHTML = `Score: ${this.score}`;
-  }
+  };
 
   private createObjects() {
     this.blocks = createArray(ROWS * BLOCK_PER_ROW).map((_, i) => {
@@ -91,7 +91,7 @@ export class Game<R extends HTMLElement> {
     this.user = new User({ ...USER_INITIAL_POSITION });
   }
 
-  onBallPositionUpdate = () => {
+  private onBallPositionUpdate = () => {
     if (this.blocks.every((b) => b.isDistroyed)) {
       this.stopGame();
       this.sound.play('won');

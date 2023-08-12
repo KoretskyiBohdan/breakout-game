@@ -13,7 +13,6 @@ const ANIMATION_DURATION = 0.13;
 
 export class User extends BaseShape {
   private animationFrameId: number;
-
   isDisabled = true;
 
   constructor(position: { x: number; y: number }) {
@@ -59,11 +58,11 @@ export class User extends BaseShape {
 
   start = () => (this.isDisabled = false);
 
-  onKeydown = ({ key }) => {
+  clear = () => window.document.removeEventListener('keydown', this.onKeydown);
+
+  private onKeydown = ({ key }) => {
     if (this.isDisabled) return;
     if (key === LEFT_KEY) this.move(-1);
     if (key === RIGHT_KEY) this.move(1);
   };
-
-  clear = () => window.document.removeEventListener('keydown', this.onKeydown);
 }

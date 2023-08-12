@@ -19,7 +19,7 @@ export class Screen<R extends HTMLElement> {
     this.init();
   }
 
-  private init() {
+  private init = () => {
     const { width, height } = this.options;
     const canvas = this.root.getElementsByTagName('canvas')[0];
 
@@ -28,9 +28,9 @@ export class Screen<R extends HTMLElement> {
     canvas.width = width;
     canvas.height = height;
     this.canvas = canvas;
-  }
+  };
 
-  enableRefresh() {
+  enableRefresh = () => {
     const perform = () => {
       if (typeof this.options.onUpdate === 'function') {
         this.options.onUpdate();
@@ -39,13 +39,13 @@ export class Screen<R extends HTMLElement> {
     };
 
     perform();
-  }
+  };
 
-  disableRefresh() {
+  disableRefresh = () => {
     window.cancelAnimationFrame(this.animationFrameId);
-  }
+  };
 
-  draw(nodes: BaseShape[]) {
+  draw = (nodes: BaseShape[]) => {
     const { width, height } = this.options;
     const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
 
@@ -69,5 +69,5 @@ export class Screen<R extends HTMLElement> {
       }
       ctx.closePath();
     }
-  }
+  };
 }

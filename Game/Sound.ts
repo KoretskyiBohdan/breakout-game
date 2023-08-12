@@ -1,4 +1,4 @@
-type AudioTypes = 'hit' | 'won' | 'lose';
+export type AudioTypes = 'hit' | 'won' | 'lose';
 
 export class Sound {
   private sounds: HTMLAudioElement[];
@@ -7,7 +7,7 @@ export class Sound {
     this.sounds = Array.from(root.getElementsByTagName('audio'));
   }
 
-  play(t: AudioTypes) {
+  play = (t: AudioTypes) => {
     this.sounds.forEach(async ({ src, dataset }) => {
       const { type } = dataset;
       if (t === type) {
@@ -17,5 +17,5 @@ export class Sound {
         //await a.play();
       }
     });
-  }
+  };
 }

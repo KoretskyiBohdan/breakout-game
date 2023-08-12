@@ -60,16 +60,16 @@ export class Ball extends BaseShape {
     window.cancelAnimationFrame(this.animationFrameId);
   };
 
-  hasCollisionsWith(obj: BaseShape) {
+  hasCollisionsWith = (obj: BaseShape) => {
     return (
       this.position.x + this.radius >= obj.position.x &&
       this.position.x - this.radius <= obj.position.x + obj.width &&
       this.position.y + this.radius >= obj.position.y &&
       this.position.y - this.radius <= obj.position.y + obj.height
     );
-  }
+  };
 
-  hasSideCollisionWith(obj: BaseShape) {
+  hasSideCollisionWith = (obj: BaseShape) => {
     const offset = 2;
     const byLeft =
       this.position.x + this.radius >= obj.position.x &&
@@ -78,10 +78,10 @@ export class Ball extends BaseShape {
       this.position.x - this.radius >= obj.position.x + obj.width - offset &&
       this.position.x - this.radius <= obj.position.x + obj.width;
     return byLeft || byRight;
-  }
+  };
 
-  changeDirection(axis: 'x' | 'y', direction?: -1 | 1) {
+  changeDirection = (axis: 'x' | 'y', direction?: -1 | 1) => {
     const key = `direction${axis.toUpperCase()}`;
     this[key] = direction || -this[key];
-  }
+  };
 }

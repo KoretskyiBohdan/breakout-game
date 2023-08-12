@@ -18,12 +18,12 @@ export class Controls {
     this.render();
   }
 
-  setIsRuning(flag: boolean) {
+  setIsRuning = (flag: boolean) => {
     this.isRunnig = flag;
     this.render();
-  }
+  };
 
-  render() {
+  render = () => {
     if (!this.root) return;
 
     this.root.innerHTML = '';
@@ -35,7 +35,7 @@ export class Controls {
     b.name = type;
     b.innerHTML = type;
     this.root.appendChild(b);
-  }
+  };
 
   onClick = (event: Event) => {
     const { config } = this;

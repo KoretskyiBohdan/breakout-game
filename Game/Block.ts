@@ -15,7 +15,7 @@ export class Block extends BaseShape {
     );
   }
 
-  destroy() {
+  destroy = () => {
     this.isDistroyed = true;
 
     const interval = window.setInterval(() => {
@@ -26,5 +26,5 @@ export class Block extends BaseShape {
 
       this.opticity = Math.max(this.opticity - 0.065, 0);
     }, 16);
-  }
+  };
 }
