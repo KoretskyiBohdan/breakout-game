@@ -1,6 +1,5 @@
 import { Screen } from './Screen';
 import { Controls } from './Controls';
-import { Sound } from './Sound';
 import { Block } from './Block';
 import { Ball } from './Ball';
 import { User } from './User';
@@ -11,9 +10,7 @@ import {
   BLOCK_HEIGHT,
   BLOCK_PADDING,
   ROWS,
-  BLOCK_PER_ROW,
-  BALL_INITIAL_POSITION,
-  USER_INITIAL_POSITION,
+  BLOCKS_PER_ROW,
 } from './constants';
 
 export const createArray = (size = 0) => {
@@ -27,7 +24,6 @@ export class Game<R extends HTMLElement> {
   private root: R;
   private screen: Screen<R>;
   private controls: Controls;
-  private sound: Sound;
   private blocks: Block[] = [];
   private ball: Ball;
   private user: User;
@@ -48,8 +44,6 @@ export class Game<R extends HTMLElement> {
       NEW: () => this.startGame(),
     });
 
-    this.sound = new Sound(root);
-    // first paint
     this.createObjects();
     this.screen.enableRefresh();
   }
@@ -76,25 +70,27 @@ export class Game<R extends HTMLElement> {
   };
 
   private createObjects() {
-    this.blocks = createArray(ROWS * BLOCK_PER_ROW).map((_, i) => {
-      const index = i % BLOCK_PER_ROW;
-      const row = Math.floor(i / BLOCK_PER_ROW);
+    this.blocks = createArray(ROWS * BLOCKS_PER_ROW).map((_, i) => {
+      const index = i % BLOCKS_PER_ROW;
+      const row = Math.floor(i / BLOCKS_PER_ROW);
       const x = BLOCK_PADDING + index * (BLOCK_WIDTH + BLOCK_PADDING);
       const y = BLOCK_PADDING + (BLOCK_HEIGHT + BLOCK_PADDING) * row;
       return new Block(x, y);
     });
 
     this.ball = new Ball(
-      { ...BALL_INITIAL_POSITION },
+      { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT - 40 },
       this.onBallPositionUpdate
     );
-    this.user = new User({ ...USER_INITIAL_POSITION });
+    this.user = new User({
+      x: SCREEN_WIDTH / 2 - BLOCK_WIDTH / 2,
+      y: SCREEN_HEIGHT - BLOCK_HEIGHT / 2 - BLOCK_PADDING,
+    });
   }
 
   private onBallPositionUpdate = () => {
     if (this.blocks.every((b) => b.isDistroyed)) {
       this.stopGame();
-      this.sound.play('won');
       return;
     }
 
@@ -114,7 +110,6 @@ export class Game<R extends HTMLElement> {
         }
         block.destroy();
         this.updateScore(this.score + 10);
-        this.sound.play('hit');
       }
     }
 
@@ -127,7 +122,6 @@ export class Game<R extends HTMLElement> {
     ) {
       ball.changeDirection('x');
     } else if (ball.position.y + ball.radius >= SCREEN_HEIGHT) {
-      this.sound.play('lose');
       this.stopGame();
     }
 

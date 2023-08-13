@@ -24,7 +24,7 @@ export class Block extends BaseShape {
         return;
       }
 
-      this.opticity = Math.max(this.opticity - 0.065, 0);
+      this.opticity = Math.max(this.opticity - 0.09, 0);
     }, 16);
   };
 }

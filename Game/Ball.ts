@@ -24,6 +24,8 @@ export class Ball extends BaseShape {
       type: 'ball',
     });
 
+    if (Math.round(Math.random())) this.changeDirection('x');
+
     this.onUpdate = onUpdate;
   }
 

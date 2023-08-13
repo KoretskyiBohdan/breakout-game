@@ -6,26 +6,16 @@ export const SCREEN_WIDTH = 710;
 export const SCREEN_HEIGHT = 460;
 
 export const ROWS = 4;
-export const BLOCK_PER_ROW = 5;
+export const BLOCKS_PER_ROW = 5;
 
 export const BALL_SIZE = 20;
 // px per second
-export const BALL_SPEED = 170;
+export const BALL_SPEED = 180;
 // px per second
 export const USER_SPEED = 640;
 
-export const BALL_INITIAL_POSITION = {
-  x: SCREEN_WIDTH / 2,
-  y: SCREEN_HEIGHT - 50,
-};
-
-export const USER_INITIAL_POSITION = {
-  x: SCREEN_WIDTH / 2 - BLOCK_WIDTH / 2,
-  y: SCREEN_HEIGHT - BLOCK_HEIGHT / 2 - BLOCK_PADDING,
-};
-
 export const COLORS = {
-  BLOCK: '#0074D9',
-  BALL: '#FF4136',
-  USER: '#001f3f',
+  BLOCK: '#91C8E4',
+  BALL: '#F94C10',
+  USER: '#102C57',
 };
