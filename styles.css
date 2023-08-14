@@ -1,5 +1,6 @@
 :root {
   --board-width: 850px;
+  touch-action: none;
 }
 
 .game {
@@ -26,10 +27,9 @@
 .game .info div {
   width: 100%;
   line-height: 30px;
-  text-align: left;
+  text-align: center;
   font-size: 18px;
   background: #e9e9ed;
-  padding: 0 8px;
 }
 
 .game canvas {

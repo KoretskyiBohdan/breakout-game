@@ -190,6 +190,9 @@ export class Game<C extends HTMLCanvasElement> {
       }
       // always change to top by Y
       ball.changeDirection('y', -1);
+      // little position randomizer
+      this.ball.x =
+        this.ball.x + Math.round((Math.random() - 0.5) * this.ball.radius);
     }
   };
 }
