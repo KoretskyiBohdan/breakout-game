@@ -13,7 +13,7 @@ import {
   BALL_SPEED,
 } from './constants';
 
-type EventType = 'start' | 'won' | 'lose' | 'score' | 'level';
+type EventType = 'start' | 'won' | 'lose' | 'score' | 'level' | 'hit';
 
 export class Game<C extends HTMLCanvasElement> {
   private canvas: C;
@@ -164,6 +164,7 @@ export class Game<C extends HTMLCanvasElement> {
         block.destroy();
         ball.changeDirection(axis);
         this.updateScore(this.score + 10 * this.level);
+        this.events.emit('hit');
       }
     });
 
