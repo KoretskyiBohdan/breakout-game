@@ -28,6 +28,7 @@ export class Game<R extends HTMLElement> {
   private ball: Ball;
   private user: User;
   private score: number = 0;
+  private level = 1;
 
   constructor(root: R) {
     this.root = root;
@@ -50,9 +51,9 @@ export class Game<R extends HTMLElement> {
 
   startGame = () => {
     this.stopGame();
-
     this.updateScore(0);
     this.createObjects();
+
     this.ball.start();
     this.user.start();
     this.controls.setIsRuning(true);
@@ -79,54 +80,50 @@ export class Game<R extends HTMLElement> {
     });
 
     this.ball = new Ball(
-      { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT - 40 },
+      SCREEN_WIDTH / 2,
+      SCREEN_HEIGHT - 40,
       this.onBallPositionUpdate
     );
-    this.user = new User({
-      x: SCREEN_WIDTH / 2 - BLOCK_WIDTH / 2,
-      y: SCREEN_HEIGHT - BLOCK_HEIGHT / 2 - BLOCK_PADDING,
-    });
+    this.user = new User(
+      SCREEN_WIDTH / 2 - BLOCK_WIDTH / 2,
+      SCREEN_HEIGHT - BLOCK_HEIGHT / 2 - BLOCK_PADDING
+    );
   }
 
   private onBallPositionUpdate = () => {
-    if (this.blocks.every((b) => b.isDistroyed)) {
-      this.stopGame();
-      return;
-    }
+    const nonDestroyedBlocks = this.blocks.filter((b) => !b.isDistroyed);
+
+    if (nonDestroyedBlocks.length === 0) return this.stopGame();
 
     const { ball, user } = this;
 
     // Blocks collisions
-    for (let i = 0; i < this.blocks.length; i++) {
-      const block = this.blocks[i];
+    nonDestroyedBlocks.forEach((block) => {
+      const axis = this.ball.hasCollisionsWith(block);
 
-      if (block.isDistroyed) continue;
-
-      if (ball.hasCollisionsWith(block)) {
-        if (ball.hasSideCollisionWith(block)) {
-          ball.changeDirection('x');
-        } else {
-          ball.changeDirection('y');
-        }
+      if (axis) {
         block.destroy();
-        this.updateScore(this.score + 10);
+        ball.changeDirection(axis);
+        this.updateScore(this.score + 10 * this.level);
       }
-    }
+    });
 
     // Board collisions
-    if (ball.position.y - ball.radius <= 0) {
+    if (ball.y - ball.radius <= 0) {
       ball.changeDirection('y');
     } else if (
-      ball.position.x - ball.radius <= 0 ||
-      ball.position.x + ball.radius >= SCREEN_WIDTH
+      ball.x - ball.radius <= 0 ||
+      ball.x + ball.radius >= SCREEN_WIDTH
     ) {
       ball.changeDirection('x');
-    } else if (ball.position.y + ball.radius >= SCREEN_HEIGHT) {
+    } else if (ball.y + ball.radius >= SCREEN_HEIGHT) {
       this.stopGame();
     }
 
+    const axis = this.ball.hasCollisionsWith(user);
+
     // User collission
-    if (ball.hasCollisionsWith(user)) {
+    if (axis) {
       // always change to top by Y
       ball.changeDirection('y', -1);
     }

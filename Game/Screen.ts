@@ -53,7 +53,6 @@ export class Screen<R extends HTMLElement> {
 
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
-      const { position } = node;
 
       ctx.beginPath();
       ctx.fillStyle = node.color;
@@ -61,10 +60,10 @@ export class Screen<R extends HTMLElement> {
       ctx.globalAlpha = node.opticity;
 
       if (node.type === 'rect') {
-        ctx.fillRect(position.x, position.y, node.width, node.height);
+        ctx.fillRect(node.x, node.y, node.width, node.height);
       }
       if (node.type === 'ball') {
-        ctx.arc(position.x, position.y, node.height / 2, 0, 2 * Math.PI);
+        ctx.arc(node.x, node.y, node.height / 2, 0, 2 * Math.PI);
         ctx.fill();
       }
       ctx.closePath();

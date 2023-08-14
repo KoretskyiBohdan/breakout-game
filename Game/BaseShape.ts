@@ -1,9 +1,6 @@
-export type ShapePosition = {
+export type ShapeOptions = {
   x: number;
   y: number;
-};
-
-export type ShapeOptions = {
   width: number;
   height: number;
   type: 'rect' | 'ball';
@@ -11,15 +8,15 @@ export type ShapeOptions = {
 };
 
 export class BaseShape {
-  position: ShapePosition;
+  x: ShapeOptions['x'];
+  y: ShapeOptions['y'];
   width: ShapeOptions['width'];
   height: ShapeOptions['height'];
   type: ShapeOptions['type'];
   color: ShapeOptions['color'];
   opticity = 1;
 
-  constructor(position: ShapePosition, options: ShapeOptions) {
-    this.position = position;
+  constructor(options: ShapeOptions) {
     Object.assign(this, options);
   }
 }

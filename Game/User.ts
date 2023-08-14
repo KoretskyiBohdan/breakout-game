@@ -15,8 +15,10 @@ export class User extends BaseShape {
   private animationFrameId: number;
   isDisabled = true;
 
-  constructor(position: { x: number; y: number }) {
-    super(position, {
+  constructor(x: number, y: number) {
+    super({
+      x,
+      y,
       width: BLOCK_WIDTH,
       height: BLOCK_HEIGHT / 2,
       color: COLORS.USER,
@@ -29,7 +31,7 @@ export class User extends BaseShape {
   move = (direction: 1 | -1) => {
     window.cancelAnimationFrame(this.animationFrameId);
 
-    const startPosition = this.position.x;
+    const startPosition = this.x;
     const startTimeStamp = Date.now();
     let isDone = false;
 
@@ -46,7 +48,7 @@ export class User extends BaseShape {
 
       const x = startPosition + (direction < 0 ? -updated : updated);
 
-      this.position.x = Math.max(Math.min(x, SCREEN_WIDTH - this.width), 0);
+      this.x = Math.max(Math.min(x, SCREEN_WIDTH - this.width), 0);
 
       if (!isDone) {
         this.animationFrameId = window.requestAnimationFrame(performAnimation);

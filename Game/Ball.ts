@@ -16,8 +16,10 @@ export class Ball extends BaseShape {
   directionX = -1;
   directionY = -1;
 
-  constructor(position: { x: number; y: number }, onUpdate: UpdateFnType) {
-    super(position, {
+  constructor(x: number, y: number, onUpdate: UpdateFnType) {
+    super({
+      x,
+      y,
       width: BALL_SIZE,
       height: BALL_SIZE,
       color: COLORS.BALL,
@@ -42,13 +44,13 @@ export class Ball extends BaseShape {
       const now = Date.now();
       const secondsPassed = (now - lastCall) / 1000;
       const diff = BALL_SPEED * secondsPassed;
-      const { position, radius, directionX, directionY } = this;
+      const { radius, directionX, directionY } = this;
 
-      const x = Math.max(position.x + diff * directionX, radius);
-      const y = Math.max(position.y + diff * directionY, radius);
+      const x = Math.max(this.x + diff * directionX, radius);
+      const y = Math.max(this.y + diff * directionY, radius);
 
-      position.x = Math.min(x, SCREEN_WIDTH - radius);
-      position.y = Math.min(y, SCREEN_HEIGHT - radius);
+      this.x = Math.min(x, SCREEN_WIDTH - radius);
+      this.y = Math.min(y, SCREEN_HEIGHT - radius);
 
       this.animationFrameId = requestAnimationFrame(move);
       lastCall = now;
@@ -62,24 +64,37 @@ export class Ball extends BaseShape {
     window.cancelAnimationFrame(this.animationFrameId);
   };
 
-  hasCollisionsWith = (obj: BaseShape) => {
-    return (
-      this.position.x + this.radius >= obj.position.x &&
-      this.position.x - this.radius <= obj.position.x + obj.width &&
-      this.position.y + this.radius >= obj.position.y &&
-      this.position.y - this.radius <= obj.position.y + obj.height
-    );
-  };
+  hasCollisionsWith = (block: BaseShape): 'x' | 'y' | void => {
+    let testX = this.x;
+    let testY = this.y;
 
-  hasSideCollisionWith = (obj: BaseShape) => {
-    const offset = 2;
-    const byLeft =
-      this.position.x + this.radius >= obj.position.x &&
-      this.position.x + this.radius <= obj.position.x + offset;
-    const byRight =
-      this.position.x - this.radius >= obj.position.x + obj.width - offset &&
-      this.position.x - this.radius <= obj.position.x + obj.width;
-    return byLeft || byRight;
+    if (this.x < block.x) {
+      testX = block.x;
+    } else if (this.x > block.x + block.width) {
+      testX = block.x + block.width;
+    }
+
+    if (this.y < block.y) {
+      testY = block.y;
+    } else if (this.y > block.y + block.height) {
+      testY = block.y + block.height;
+    }
+
+    const distX = this.x - testX;
+    const distY = this.y - testY;
+
+    const distance = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+
+    if (distance <= this.radius) {
+      if (
+        this.y + this.radius / 2 >= block.y &&
+        this.y - this.radius / 2 <= block.y + block.height
+      ) {
+        return 'x';
+      } else {
+        return 'y';
+      }
+    }
   };
 
   changeDirection = (axis: 'x' | 'y', direction?: -1 | 1) => {
