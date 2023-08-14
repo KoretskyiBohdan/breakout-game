@@ -22,11 +22,15 @@ export class User extends BaseShape {
       width: BLOCK_WIDTH,
       height: BLOCK_HEIGHT / 2,
       color: COLORS.USER,
-      type: 'rect',
     });
 
     window.document.addEventListener('keydown', this.onKeydown);
   }
+
+  draw = (ctx: CanvasRenderingContext2D) => {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  };
 
   move = (direction: 1 | -1) => {
     window.cancelAnimationFrame(this.animationFrameId);

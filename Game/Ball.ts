@@ -23,7 +23,6 @@ export class Ball extends BaseShape {
       width: BALL_SIZE,
       height: BALL_SIZE,
       color: COLORS.BALL,
-      type: 'ball',
     });
 
     if (Math.round(Math.random())) this.changeDirection('x');
@@ -34,6 +33,12 @@ export class Ball extends BaseShape {
   get radius() {
     return this.height / 2;
   }
+
+  draw = (ctx: CanvasRenderingContext2D) => {
+    ctx.fillStyle = this.color;
+    ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+    ctx.fill();
+  };
 
   start = () => {
     this.stop();
