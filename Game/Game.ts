@@ -169,6 +169,13 @@ export class Game<C extends HTMLCanvasElement> {
 
     // User collission
     if (this.ball.hasCollisionsWith(user)) {
+      // Hit by a corner of user block
+      if (
+        this.ball.x <= this.user.x + this.ball.width ||
+        this.ball.x >= this.user.x + this.user.width - this.ball.width
+      ) {
+        ball.changeDirection('x');
+      }
       // always change to top by Y
       ball.changeDirection('y', -1);
     }
