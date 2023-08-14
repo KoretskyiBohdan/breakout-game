@@ -19,15 +19,21 @@ export class Game<C extends HTMLCanvasElement> {
   private ball: Ball;
   private user: User;
   private isRunning = false;
+  private boardOffsetX: number;
   public score: number = 0;
   public level = 1;
 
   constructor(canvas: C) {
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      throw new Error('Non root valid element!');
+    }
     this.canvas = canvas;
     this.canvas.width = SCREEN_WIDTH;
     this.canvas.height = SCREEN_HEIGHT;
+    this.boardOffsetX = this.canvas.getBoundingClientRect().x;
 
     window.document.addEventListener('keydown', this.onKeydown);
+    window.document.addEventListener('touchmove', this.onTouchmove);
 
     this.addGameListeners();
     this.addGameObjects();
@@ -119,6 +125,11 @@ export class Game<C extends HTMLCanvasElement> {
     if (!this.isRunning) return;
     if (key === 'ArrowLeft') this.user.move(-1);
     if (key === 'ArrowRight') this.user.move(1);
+  };
+
+  private onTouchmove = ({ touches: [{ clientX }] }: TouchEvent) => {
+    const x = clientX - this.boardOffsetX - this.user.width / 2;
+    this.user.x = Math.min(Math.max(x, 0), SCREEN_WIDTH - this.user.width);
   };
 
   private updateScore = (val: number) => {
