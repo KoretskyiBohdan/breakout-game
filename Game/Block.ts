@@ -16,9 +16,11 @@ export class Block extends BaseShape {
   }
 
   draw = (ctx: CanvasRenderingContext2D) => {
+    ctx.save();
     ctx.fillStyle = this.color;
     ctx.globalAlpha = this.opticity;
     ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.restore();
   };
 
   destroy = () => {

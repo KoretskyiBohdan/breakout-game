@@ -35,9 +35,11 @@ export class Ball extends BaseShape {
   }
 
   draw = (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
     ctx.fillStyle = this.color;
     ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
     ctx.fill();
+    ctx.closePath();
   };
 
   start = () => {

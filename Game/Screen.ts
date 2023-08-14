@@ -51,10 +51,6 @@ export class Screen<R extends HTMLElement> {
 
     ctx.clearRect(0, 0, width, height);
 
-    nodes.forEach((node) => {
-      ctx.beginPath();
-      node.draw(ctx);
-      ctx.closePath();
-    });
+    nodes.forEach((node) => node.draw(ctx));
   };
 }
