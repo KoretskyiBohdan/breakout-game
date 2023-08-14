@@ -10,11 +10,14 @@ import {
   BLOCK_PADDING,
   ROWS,
   BLOCKS_PER_ROW,
+  BALL_SPEED,
 } from './constants';
+
+type EventType = 'start' | 'won' | 'lose' | 'score' | 'level';
 
 export class Game<C extends HTMLCanvasElement> {
   private canvas: C;
-  private events = new Events<'start' | 'won' | 'lose' | 'score:update'>();
+  private events = new Events<EventType>();
   private blocks: Block[] = [];
   private ball: Ball;
   private user: User;
@@ -47,13 +50,15 @@ export class Game<C extends HTMLCanvasElement> {
   private addGameListeners = () => {
     this.events
       .on('start', () => {
-        this.isRunning = true;
-        this.updateScore(0);
         this.resetObjects();
         if (Math.round(Math.random())) this.ball.changeDirection('x');
+        this.updateScore(0);
+        this.updateLevel(1);
+        this.isRunning = true;
       })
       .on('won', () => {
-        this.isRunning = false;
+        this.resetObjects();
+        this.updateLevel(this.level + 1);
       })
       .on('lose', () => {
         this.isRunning = false;
@@ -132,9 +137,16 @@ export class Game<C extends HTMLCanvasElement> {
     this.user.x = Math.min(Math.max(x, 0), SCREEN_WIDTH - this.user.width);
   };
 
-  private updateScore = (val: number) => {
-    this.score = val;
-    this.events.emit('score:update');
+  private updateScore = (score: number) => {
+    this.score = score;
+    this.events.emit('score');
+  };
+
+  private updateLevel = (level: number) => {
+    this.level = level;
+    const additional = 1 + (level - 1) / 10;
+    this.ball.speed = BALL_SPEED * additional;
+    this.events.emit('level');
   };
 
   private checkBallCollissions = () => {

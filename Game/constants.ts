@@ -2,11 +2,11 @@ export const BLOCK_WIDTH = 130;
 export const BLOCK_HEIGHT = 30;
 export const BLOCK_PADDING = 10;
 
-export const SCREEN_WIDTH = 710;
+export const SCREEN_WIDTH = 850;
 export const SCREEN_HEIGHT = 460;
 
 export const ROWS = 4;
-export const BLOCKS_PER_ROW = 5;
+export const BLOCKS_PER_ROW = 6;
 
 export const BALL_SIZE = 20;
 // px per second

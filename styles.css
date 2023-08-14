@@ -1,3 +1,7 @@
+:root {
+  --board-width: 850px;
+}
+
 .game {
   font-family: sans-serif;
   display: flex;
@@ -8,16 +12,23 @@
 }
 
 .game .info {
+  display: flex;
+  width: var(--board-width);
+  align-items: center;
+  justify-content: space-around;
   color: #001f3f;
-  margin-bottom: 20px;
+  border: 1px solid #104d89;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  overflow: hidden;
 }
 
-.game .info .score {
+.game .info div {
+  width: 100%;
   line-height: 30px;
   text-align: left;
   font-size: 18px;
   background: #e9e9ed;
-  border-radius: 6px;
   padding: 0 8px;
 }
 
@@ -34,5 +45,4 @@
   color: #001f3f;
   height: 40px;
   padding: 0 20px;
-  /* border: none; */
 }

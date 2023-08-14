@@ -23,6 +23,7 @@ export class Ball extends BaseShape {
       y,
       directionX: this.directionX,
       directionY: this.directionY,
+      speed: this.speed,
     };
   }
 

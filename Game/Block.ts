@@ -4,6 +4,7 @@ import { BLOCK_WIDTH, BLOCK_HEIGHT, COLORS } from './constants';
 export class Block extends BaseShape {
   isDistroyed = false;
   opticity = 1;
+  intervalId: number;
 
   constructor(x: number, y: number) {
     super({
@@ -24,6 +25,7 @@ export class Block extends BaseShape {
   };
 
   reset = () => {
+    window.clearInterval(this.intervalId);
     this.isDistroyed = false;
     this.opticity = 1;
   };
@@ -31,13 +33,13 @@ export class Block extends BaseShape {
   destroy = () => {
     this.isDistroyed = true;
 
-    const interval = window.setInterval(() => {
+    this.intervalId = window.setInterval(() => {
       if (this.opticity === 0) {
-        window.clearInterval(interval);
+        window.clearInterval(this.intervalId);
         return;
       }
 
-      this.opticity = Math.max(this.opticity - 0.09, 0);
+      this.opticity = Math.max(this.opticity - 0.11, 0);
     }, 16);
   };
 }
