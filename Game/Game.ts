@@ -1,5 +1,4 @@
-import { Screen } from './Screen';
-import { Controls } from './Controls';
+import { Events } from './Events';
 import { Block } from './Block';
 import { Ball } from './Ball';
 import { User } from './User';
@@ -13,87 +12,124 @@ import {
   BLOCKS_PER_ROW,
 } from './constants';
 
-export const createArray = (size = 0) => {
-  const arr: null[] = [];
-
-  for (let i = 0; i < size; i++) arr[i] = null;
-  return arr;
-};
-
-export class Game<R extends HTMLElement> {
-  private root: R;
-  private screen: Screen<R>;
-  private controls: Controls;
+export class Game<C extends HTMLCanvasElement> {
+  private canvas: C;
+  private events = new Events<'start' | 'won' | 'lose' | 'score:update'>();
   private blocks: Block[] = [];
   private ball: Ball;
   private user: User;
-  private score: number = 0;
-  private level = 1;
+  private isRunning = false;
+  public score: number = 0;
+  public level = 1;
 
-  constructor(root: R) {
-    this.root = root;
-    this.screen = new Screen(root, {
-      width: SCREEN_WIDTH,
-      height: SCREEN_HEIGHT,
-      onUpdate: () => {
-        this.screen.draw([...this.blocks, this.ball, this.user]);
-      },
-    });
+  constructor(canvas: C) {
+    this.canvas = canvas;
+    this.canvas.width = SCREEN_WIDTH;
+    this.canvas.height = SCREEN_HEIGHT;
 
-    this.controls = new Controls(root, {
-      START: () => this.startGame(),
-      NEW: () => this.startGame(),
-    });
+    window.document.addEventListener('keydown', this.onKeydown);
 
-    this.createObjects();
-    this.screen.enableRefresh();
+    this.addGameListeners();
+    this.addGameObjects();
+    this.startUpdates();
   }
 
-  startGame = () => {
-    this.stopGame();
-    this.updateScore(0);
-    this.createObjects();
+  start = () => this.events.emit('start');
 
-    this.ball.start();
-    this.user.start();
-    this.controls.setIsRuning(true);
+  on = this.events.on;
+
+  private addGameListeners = () => {
+    this.events
+      .on('start', () => {
+        this.isRunning = true;
+        this.updateScore(0);
+        this.resetObjects();
+        if (Math.round(Math.random())) this.ball.changeDirection('x');
+      })
+      .on('won', () => {
+        this.isRunning = false;
+      })
+      .on('lose', () => {
+        this.isRunning = false;
+      });
   };
 
-  stopGame = () => {
-    this.ball.stop();
-    this.controls.setIsRuning(false);
-  };
-
-  private updateScore = (val: number) => {
-    this.score = val;
-    const score = this.root.getElementsByClassName('score')[0];
-    if (score) score.innerHTML = `Score: ${this.score}`;
-  };
-
-  private createObjects() {
-    this.blocks = createArray(ROWS * BLOCKS_PER_ROW).map((_, i) => {
+  private addGameObjects = () => {
+    for (let i = 0; i < ROWS * BLOCKS_PER_ROW; i++) {
       const index = i % BLOCKS_PER_ROW;
       const row = Math.floor(i / BLOCKS_PER_ROW);
       const x = BLOCK_PADDING + index * (BLOCK_WIDTH + BLOCK_PADDING);
       const y = BLOCK_PADDING + (BLOCK_HEIGHT + BLOCK_PADDING) * row;
-      return new Block(x, y);
-    });
+      this.blocks.push(new Block(x, y));
+    }
 
-    this.ball = new Ball(
-      SCREEN_WIDTH / 2,
-      SCREEN_HEIGHT - 40,
-      this.onBallPositionUpdate
-    );
+    this.ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 40);
     this.user = new User(
       SCREEN_WIDTH / 2 - BLOCK_WIDTH / 2,
       SCREEN_HEIGHT - BLOCK_HEIGHT / 2 - BLOCK_PADDING
     );
-  }
+  };
 
-  private onBallPositionUpdate = () => {
+  private resetObjects = () => {
+    this.blocks.forEach((block) => block.reset());
+    this.ball.reset();
+    this.user.reset();
+  };
+
+  private startUpdates = () => {
+    let lastUpdate = Date.now();
+    let firstPaint = true;
+    const performScreenUpdate = () => {
+      if (this.isRunning || firstPaint) {
+        const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+
+        this.moveBall(lastUpdate);
+        this.checkBallCollissions();
+
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.blocks.forEach((block) => block.draw(ctx));
+        this.ball.draw(ctx);
+        this.user.draw(ctx);
+      }
+
+      lastUpdate = Date.now();
+      firstPaint = false;
+
+      requestAnimationFrame(performScreenUpdate);
+    };
+
+    performScreenUpdate();
+  };
+
+  moveBall = (lastUpdate: number) => {
+    const { radius, directionX, directionY } = this.ball;
+
+    const now = Date.now();
+    const secondsPassed = (now - lastUpdate) / 1000;
+    const diff = this.ball.speed * secondsPassed;
+
+    const x = Math.max(this.ball.x + diff * directionX, radius);
+    const y = Math.max(this.ball.y + diff * directionY, radius);
+
+    this.ball.x = Math.min(x, SCREEN_WIDTH - radius);
+    this.ball.y = Math.min(y, SCREEN_HEIGHT - radius);
+  };
+
+  private onKeydown = ({ key }: KeyboardEvent) => {
+    if (!this.isRunning) return;
+    if (key === 'ArrowLeft') this.user.move(-1);
+    if (key === 'ArrowRight') this.user.move(1);
+  };
+
+  private updateScore = (val: number) => {
+    this.score = val;
+    this.events.emit('score:update');
+  };
+
+  private checkBallCollissions = () => {
     const nonDestroyedBlocks = this.blocks.filter((b) => !b.isDistroyed);
 
-    if (nonDestroyedBlocks.length === 0) return this.stopGame();
+    if (nonDestroyedBlocks.length === 0) return this.events.emit('won');
 
     const { ball, user } = this;
 
@@ -117,13 +153,11 @@ export class Game<R extends HTMLElement> {
     ) {
       ball.changeDirection('x');
     } else if (ball.y + ball.radius >= SCREEN_HEIGHT) {
-      this.stopGame();
+      this.events.emit('lose');
     }
 
-    const axis = this.ball.hasCollisionsWith(user);
-
     // User collission
-    if (axis) {
+    if (this.ball.hasCollisionsWith(user)) {
       // always change to top by Y
       ball.changeDirection('y', -1);
     }

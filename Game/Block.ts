@@ -23,6 +23,11 @@ export class Block extends BaseShape {
     ctx.restore();
   };
 
+  reset = () => {
+    this.isDistroyed = false;
+    this.opticity = 1;
+  };
+
   destroy = () => {
     this.isDistroyed = true;
 

@@ -1,22 +1,15 @@
 import { BaseShape } from './BaseShape';
-import {
-  BALL_SIZE,
-  BALL_SPEED,
-  COLORS,
-  SCREEN_WIDTH,
-  SCREEN_HEIGHT,
-} from './constants';
-
-type UpdateFnType = () => unknown;
+import { BALL_SIZE, BALL_SPEED, COLORS } from './constants';
 
 export class Ball extends BaseShape {
-  private animationFrameId: number;
-  private onUpdate: UpdateFnType;
-
+  speed = BALL_SPEED;
+  radius = BALL_SIZE / 2;
   directionX = -1;
   directionY = -1;
 
-  constructor(x: number, y: number, onUpdate: UpdateFnType) {
+  private _initialParams: Record<string, number> = {};
+
+  constructor(x: number, y: number) {
     super({
       x,
       y,
@@ -25,14 +18,15 @@ export class Ball extends BaseShape {
       color: COLORS.BALL,
     });
 
-    if (Math.round(Math.random())) this.changeDirection('x');
-
-    this.onUpdate = onUpdate;
+    this._initialParams = {
+      x,
+      y,
+      directionX: this.directionX,
+      directionY: this.directionY,
+    };
   }
 
-  get radius() {
-    return this.height / 2;
-  }
+  reset = () => Object.assign(this, this._initialParams);
 
   draw = (ctx: CanvasRenderingContext2D) => {
     ctx.beginPath();
@@ -40,35 +34,6 @@ export class Ball extends BaseShape {
     ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
     ctx.fill();
     ctx.closePath();
-  };
-
-  start = () => {
-    this.stop();
-
-    let lastCall = Date.now();
-
-    const move = () => {
-      const now = Date.now();
-      const secondsPassed = (now - lastCall) / 1000;
-      const diff = BALL_SPEED * secondsPassed;
-      const { radius, directionX, directionY } = this;
-
-      const x = Math.max(this.x + diff * directionX, radius);
-      const y = Math.max(this.y + diff * directionY, radius);
-
-      this.x = Math.min(x, SCREEN_WIDTH - radius);
-      this.y = Math.min(y, SCREEN_HEIGHT - radius);
-
-      this.animationFrameId = requestAnimationFrame(move);
-      lastCall = now;
-      if (typeof this.onUpdate === 'function') this.onUpdate();
-    };
-
-    this.animationFrameId = requestAnimationFrame(move);
-  };
-
-  stop = () => {
-    window.cancelAnimationFrame(this.animationFrameId);
   };
 
   hasCollisionsWith = (block: BaseShape): 'x' | 'y' | void => {

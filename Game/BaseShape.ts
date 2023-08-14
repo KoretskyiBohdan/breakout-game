@@ -17,5 +17,7 @@ export abstract class BaseShape {
     Object.assign(this, options);
   }
 
-  abstract draw: (ctx: CanvasRenderingContext2D) => void;
+  abstract draw(ctx: CanvasRenderingContext2D): void;
+
+  abstract reset(): void;
 }

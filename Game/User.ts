@@ -7,13 +7,11 @@ import {
   SCREEN_WIDTH,
 } from './constants';
 
-const LEFT_KEY = 'ArrowLeft';
-const RIGHT_KEY = 'ArrowRight';
 const ANIMATION_DURATION = 0.13;
 
 export class User extends BaseShape {
   private animationFrameId: number;
-  isDisabled = true;
+  private _initialX: number;
 
   constructor(x: number, y: number) {
     super({
@@ -24,8 +22,12 @@ export class User extends BaseShape {
       color: COLORS.USER,
     });
 
-    window.document.addEventListener('keydown', this.onKeydown);
+    this._initialX = x;
   }
+
+  reset = () => {
+    this.x = this._initialX;
+  };
 
   draw = (ctx: CanvasRenderingContext2D) => {
     ctx.fillStyle = this.color;
@@ -60,15 +62,5 @@ export class User extends BaseShape {
     };
 
     this.animationFrameId = window.requestAnimationFrame(performAnimation);
-  };
-
-  start = () => (this.isDisabled = false);
-
-  clear = () => window.document.removeEventListener('keydown', this.onKeydown);
-
-  private onKeydown = ({ key }) => {
-    if (this.isDisabled) return;
-    if (key === LEFT_KEY) this.move(-1);
-    if (key === RIGHT_KEY) this.move(1);
   };
 }
