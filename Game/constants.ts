@@ -10,7 +10,7 @@ export const BLOCKS_PER_ROW = 6;
 
 export const BALL_SIZE = 20;
 // px per second
-export const BALL_SPEED = 190;
+export const BALL_SPEED = 270;
 // px per second
 export const USER_SPEED = 640;
 

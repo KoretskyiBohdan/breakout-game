@@ -4,8 +4,8 @@ import { BALL_SIZE, BALL_SPEED, COLORS } from './constants';
 export class Ball extends BaseShape {
   speed = BALL_SPEED;
   radius = BALL_SIZE / 2;
-  directionX = -1;
-  directionY = -1;
+  directionX = -Math.SQRT1_2;
+  directionY = -Math.SQRT1_2;
 
   private _initialParams: Record<string, number> = {};
 
@@ -76,5 +76,12 @@ export class Ball extends BaseShape {
     } else {
       this.directionY = direction ?? -this.directionY;
     }
+  };
+
+  bounceOffPaddle = (hitOffset: number) => {
+    const maxAngle = (5 * Math.PI) / 12; // 75° max
+    const angle = hitOffset * maxAngle;
+    this.directionX = Math.sin(angle);
+    this.directionY = -Math.cos(angle);
   };
 }

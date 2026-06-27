@@ -193,20 +193,10 @@ export class Game<C extends HTMLCanvasElement> {
       this.events.emit('lose');
     }
 
-    // User collission
-    if (this.ball.hasCollisionsWith(user)) {
-      // Hit by a corner of user block
-      if (
-        this.ball.x <= this.user.x + this.ball.radius ||
-        this.ball.x >= this.user.x + this.user.width - this.ball.radius
-      ) {
-        ball.changeDirection('x');
-      }
-      // always change to top by Y
-      ball.changeDirection('y', -1);
-      // little position randomizer
-      this.ball.x =
-        this.ball.x + Math.round((Math.random() - 0.5) * this.ball.radius);
+    // User collision — angle depends on where the ball hits the paddle
+    if (ball.hasCollisionsWith(user)) {
+      const hitOffset = ((ball.x - user.x) / user.width) * 2 - 1; // -1 (left) to 1 (right)
+      ball.bounceOffPaddle(Math.max(-1, Math.min(1, hitOffset)));
     }
   };
 }
