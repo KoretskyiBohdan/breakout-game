@@ -88,14 +88,13 @@ export class Game<C extends HTMLCanvasElement> {
   };
 
   private startUpdates = () => {
+    const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
     let lastUpdate = Date.now();
     let firstPaint = true;
     const performScreenUpdate = () => {
       if (this.isRunning || firstPaint) {
-        const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-
         this.moveBall(lastUpdate);
-        this.checkBallCollissions();
+        this.checkBallCollisions();
 
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.blocks.forEach((block) => block.draw(ctx));
@@ -112,7 +111,7 @@ export class Game<C extends HTMLCanvasElement> {
     performScreenUpdate();
   };
 
-  moveBall = (lastUpdate: number) => {
+  private moveBall = (lastUpdate: number) => {
     const { radius, directionX, directionY } = this.ball;
 
     const now = Date.now();
@@ -133,6 +132,7 @@ export class Game<C extends HTMLCanvasElement> {
   };
 
   private onTouchmove = ({ touches }: TouchEvent) => {
+    if (!this.isRunning) return;
     const touch = touches[0];
     if (!touch) return;
     const x = touch.clientX - this.boardOffsetX - this.user.width / 2;
@@ -151,7 +151,7 @@ export class Game<C extends HTMLCanvasElement> {
     this.events.emit('level');
   };
 
-  private checkBallCollissions = () => {
+  private checkBallCollisions = () => {
     const nonDestroyedBlocks = this.blocks.filter((b) => !b.isDestroyed);
 
     if (nonDestroyedBlocks.length === 0) return this.events.emit('won');
@@ -186,8 +186,8 @@ export class Game<C extends HTMLCanvasElement> {
     if (this.ball.hasCollisionsWith(user)) {
       // Hit by a corner of user block
       if (
-        this.ball.x <= this.user.x + this.ball.width ||
-        this.ball.x >= this.user.x + this.user.width - this.ball.width
+        this.ball.x <= this.user.x + this.ball.radius ||
+        this.ball.x >= this.user.x + this.user.width - this.ball.radius
       ) {
         ball.changeDirection('x');
       }
