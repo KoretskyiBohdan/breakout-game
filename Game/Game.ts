@@ -168,17 +168,18 @@ export class Game<C extends HTMLCanvasElement> {
 
     const { ball, user } = this;
 
-    // Blocks collisions
-    nonDestroyedBlocks.forEach((block) => {
-      const axis = this.ball.hasCollisionsWith(block);
+    // Blocks collisions — stop after first hit to prevent destroying multiple blocks per frame
+    for (const block of nonDestroyedBlocks) {
+      const axis = ball.hasCollisionsWith(block);
 
       if (axis) {
         block.destroy();
         ball.changeDirection(axis);
         this.updateScore(this.score + 10 * this.level);
         this.events.emit('hit');
+        break;
       }
-    });
+    }
 
     // Board collisions
     if (ball.y - ball.radius <= 0) {
