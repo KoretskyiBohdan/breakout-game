@@ -22,6 +22,7 @@ export class Game<C extends HTMLCanvasElement> {
   private ball!: Ball;
   private user!: User;
   private isRunning = false;
+  private countdownEnd: number | null = null;
   private boardOffsetX: number;
   public score: number = 0;
   public level = 1;
@@ -46,6 +47,7 @@ export class Game<C extends HTMLCanvasElement> {
   start = () => this.events.emit('start');
 
   pause = () => {
+    this.countdownEnd = null;
     this.isRunning = false;
     this.events.emit('pause');
   };
@@ -57,6 +59,10 @@ export class Game<C extends HTMLCanvasElement> {
 
   on = this.events.on;
 
+  private startCountdown = () => {
+    this.countdownEnd = Date.now() + 3000;
+  };
+
   private addGameListeners = () => {
     this.events
       .on('start', () => {
@@ -64,11 +70,13 @@ export class Game<C extends HTMLCanvasElement> {
         if (Math.round(Math.random())) this.ball.changeDirection('x');
         this.updateScore(0);
         this.updateLevel(1);
-        this.isRunning = true;
+        this.startCountdown();
       })
       .on('won', () => {
+        this.isRunning = false;
         this.resetObjects();
         this.updateLevel(this.level + 1);
+        this.startCountdown();
       })
       .on('lose', () => {
         this.isRunning = false;
@@ -102,23 +110,48 @@ export class Game<C extends HTMLCanvasElement> {
     let lastUpdate = Date.now();
     let firstPaint = true;
     const performScreenUpdate = () => {
-      if (this.isRunning || firstPaint) {
-        this.moveBall(lastUpdate);
-        this.checkBallCollisions();
+      const shouldRender = this.isRunning || this.countdownEnd !== null || firstPaint;
+
+      if (shouldRender) {
+        if (this.isRunning) {
+          this.moveBall(lastUpdate);
+          this.checkBallCollisions();
+        }
 
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.blocks.forEach((block) => block.draw(ctx));
         this.ball.draw(ctx);
         this.user.draw(ctx);
+
+        if (this.countdownEnd !== null) {
+          const remaining = this.countdownEnd - Date.now();
+          if (remaining <= 0) {
+            this.countdownEnd = null;
+            this.isRunning = true;
+          } else {
+            this.drawCountdown(ctx, Math.ceil(remaining / 1000));
+          }
+        }
       }
 
       lastUpdate = Date.now();
       firstPaint = false;
-
       requestAnimationFrame(performScreenUpdate);
     };
 
     performScreenUpdate();
+  };
+
+  private drawCountdown = (ctx: CanvasRenderingContext2D, count: number) => {
+    ctx.save();
+    ctx.fillStyle = 'rgba(247, 247, 242, 0.8)';
+    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    ctx.fillStyle = '#111111';
+    ctx.font = '900 120px "Arial Black", Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(count), SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    ctx.restore();
   };
 
   private moveBall = (lastUpdate: number) => {
