@@ -4,9 +4,11 @@
   "description": "",
   "devDependencies": {
     "@parcel/transformer-inline-string": "^2.9.3",
-    "parcel": "^2.9.3"
+    "parcel": "^2.9.3",
+    "typescript": "^5.5.0"
   },
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "start": "parcel index.html --no-cache",
     "build": "parcel build index.html",
     "gh-pages:build": "parcel build index.html --dist-dir=docs --public-url=https://koretskyibohdan.github.io/breakout-game/"

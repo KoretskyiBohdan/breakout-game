@@ -19,8 +19,8 @@ export class Game<C extends HTMLCanvasElement> {
   private canvas: C;
   private events = new Events<EventType>();
   private blocks: Block[] = [];
-  private ball: Ball;
-  private user: User;
+  private ball!: Ball;
+  private user!: User;
   private isRunning = false;
   private boardOffsetX: number;
   public score: number = 0;
@@ -77,7 +77,7 @@ export class Game<C extends HTMLCanvasElement> {
     this.ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 40);
     this.user = new User(
       SCREEN_WIDTH / 2 - BLOCK_WIDTH / 2,
-      SCREEN_HEIGHT - BLOCK_HEIGHT / 2 - BLOCK_PADDING
+      SCREEN_HEIGHT - BLOCK_HEIGHT / 2 - BLOCK_PADDING,
     );
   };
 
@@ -132,8 +132,10 @@ export class Game<C extends HTMLCanvasElement> {
     if (key === 'ArrowRight') this.user.move(1);
   };
 
-  private onTouchmove = ({ touches: [{ clientX }] }: TouchEvent) => {
-    const x = clientX - this.boardOffsetX - this.user.width / 2;
+  private onTouchmove = ({ touches }: TouchEvent) => {
+    const touch = touches[0];
+    if (!touch) return;
+    const x = touch.clientX - this.boardOffsetX - this.user.width / 2;
     this.user.x = Math.min(Math.max(x, 0), SCREEN_WIDTH - this.user.width);
   };
 

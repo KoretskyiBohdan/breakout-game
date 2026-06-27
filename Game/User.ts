@@ -10,7 +10,7 @@ import {
 const ANIMATION_DURATION = 0.13;
 
 export class User extends BaseShape {
-  private animationFrameId: number;
+  private animationFrameId?: number;
   private _initialX: number;
 
   constructor(x: number, y: number) {
@@ -35,7 +35,7 @@ export class User extends BaseShape {
   };
 
   move = (direction: 1 | -1) => {
-    window.cancelAnimationFrame(this.animationFrameId);
+    if (this.animationFrameId !== undefined) window.cancelAnimationFrame(this.animationFrameId);
 
     const startPosition = this.x;
     const startTimeStamp = Date.now();

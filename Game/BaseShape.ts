@@ -14,7 +14,11 @@ export abstract class BaseShape {
   color: ShapeOptions['color'];
 
   constructor(options: ShapeOptions) {
-    Object.assign(this, options);
+    this.x = options.x;
+    this.y = options.y;
+    this.width = options.width;
+    this.height = options.height;
+    this.color = options.color;
   }
 
   abstract draw(ctx: CanvasRenderingContext2D): void;

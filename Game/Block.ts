@@ -4,7 +4,7 @@ import { BLOCK_WIDTH, BLOCK_HEIGHT, COLORS } from './constants';
 export class Block extends BaseShape {
   isDistroyed = false;
   opticity = 1;
-  intervalId: number;
+  intervalId?: number;
 
   constructor(x: number, y: number) {
     super({

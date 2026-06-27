@@ -71,7 +71,10 @@ export class Ball extends BaseShape {
   };
 
   changeDirection = (axis: 'x' | 'y', direction?: -1 | 1) => {
-    const key = `direction${axis.toUpperCase()}`;
-    this[key] = direction || -this[key];
+    if (axis === 'x') {
+      this.directionX = direction ?? -this.directionX;
+    } else {
+      this.directionY = direction ?? -this.directionY;
+    }
   };
 }
