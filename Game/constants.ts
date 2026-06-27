@@ -15,7 +15,7 @@ export const BALL_SPEED = 190;
 export const USER_SPEED = 640;
 
 export const COLORS = {
-  BLOCK: '#91C8E4',
-  BALL: '#F94C10',
-  USER: '#102C57',
+  BLOCK: '#c4c4b8',
+  BALL: '#ff4136',
+  USER: '#111111',
 };

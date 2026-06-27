@@ -13,7 +13,7 @@ import {
   BALL_SPEED,
 } from './constants';
 
-type EventType = 'start' | 'won' | 'lose' | 'score' | 'level' | 'hit';
+type EventType = 'start' | 'won' | 'lose' | 'score' | 'level' | 'hit' | 'pause' | 'resume';
 
 export class Game<C extends HTMLCanvasElement> {
   private canvas: C;
@@ -44,6 +44,16 @@ export class Game<C extends HTMLCanvasElement> {
   }
 
   start = () => this.events.emit('start');
+
+  pause = () => {
+    this.isRunning = false;
+    this.events.emit('pause');
+  };
+
+  resume = () => {
+    this.isRunning = true;
+    this.events.emit('resume');
+  };
 
   on = this.events.on;
 

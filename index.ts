@@ -15,15 +15,43 @@ async function init() {
     await el.play();
   };
 
-  button.addEventListener('click', game.start);
+  let isStarted = false;
+  let isPaused = false;
+
+  button.addEventListener('click', () => {
+    if (!isStarted) {
+      game.start();
+    } else if (isPaused) {
+      game.resume();
+    } else {
+      game.pause();
+    }
+  });
 
   game
     .on('start', () => {
-      button.innerText = 'New';
+      isStarted = true;
+      isPaused = false;
+      button.innerText = 'Pause';
       status.innerHTML = 'Status: Playing';
     })
-    .on('won', () => (button.innerText = 'Start'))
+    .on('pause', () => {
+      isPaused = true;
+      button.innerText = 'Resume';
+      status.innerHTML = 'Status: Paused';
+    })
+    .on('resume', () => {
+      isPaused = false;
+      button.innerText = 'Pause';
+      status.innerHTML = 'Status: Playing';
+    })
+    .on('won', () => {
+      isPaused = false;
+      button.innerText = 'Pause';
+    })
     .on('lose', () => {
+      isStarted = false;
+      isPaused = false;
       button.innerText = 'Start';
       status.innerHTML = 'Status: Lose';
     })
