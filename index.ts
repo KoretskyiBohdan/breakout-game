@@ -9,8 +9,10 @@ async function init() {
   const effects = [...document.querySelectorAll('audio')];
 
   const playEffect = async (name: string) => {
-    const { src } = effects.find(({ dataset }) => dataset.name === name) || {};
-    if (src) await new Audio(src).play();
+    const el = effects.find(({ dataset }) => dataset.name === name);
+    if (!el) return;
+    el.currentTime = 0;
+    await el.play();
   };
 
   button.addEventListener('click', game.start);

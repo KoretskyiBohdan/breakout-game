@@ -152,7 +152,7 @@ export class Game<C extends HTMLCanvasElement> {
   };
 
   private checkBallCollissions = () => {
-    const nonDestroyedBlocks = this.blocks.filter((b) => !b.isDistroyed);
+    const nonDestroyedBlocks = this.blocks.filter((b) => !b.isDestroyed);
 
     if (nonDestroyedBlocks.length === 0) return this.events.emit('won');
 

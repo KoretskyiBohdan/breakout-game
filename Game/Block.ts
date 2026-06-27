@@ -2,8 +2,8 @@ import { BaseShape } from './BaseShape';
 import { BLOCK_WIDTH, BLOCK_HEIGHT, COLORS } from './constants';
 
 export class Block extends BaseShape {
-  isDistroyed = false;
-  opticity = 1;
+  isDestroyed = false;
+  opacity = 1;
   intervalId?: number;
 
   constructor(x: number, y: number) {
@@ -19,27 +19,28 @@ export class Block extends BaseShape {
   draw = (ctx: CanvasRenderingContext2D) => {
     ctx.save();
     ctx.fillStyle = this.color;
-    ctx.globalAlpha = this.opticity;
+    ctx.globalAlpha = this.opacity;
     ctx.fillRect(this.x, this.y, this.width, this.height);
     ctx.restore();
   };
 
   reset = () => {
-    window.clearInterval(this.intervalId);
-    this.isDistroyed = false;
-    this.opticity = 1;
+    if (this.intervalId) {
+      window.cancelAnimationFrame(this.intervalId);
+    }
+    this.isDestroyed = false;
+    this.opacity = 1;
   };
 
   destroy = () => {
-    this.isDistroyed = true;
+    this.isDestroyed = true;
 
-    this.intervalId = window.setInterval(() => {
-      if (this.opticity === 0) {
-        window.clearInterval(this.intervalId);
-        return;
-      }
+    const fade = () => {
+      if (this.opacity <= 0) return;
+      this.opacity = Math.max(this.opacity - 0.11, 0);
+      this.intervalId = window.requestAnimationFrame(fade);
+    };
 
-      this.opticity = Math.max(this.opticity - 0.11, 0);
-    }, 16);
+    this.intervalId = window.requestAnimationFrame(fade);
   };
 }
